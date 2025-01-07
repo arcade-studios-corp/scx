@@ -44,6 +44,31 @@
                 margin-top: 20px;
             }
 
+            .controls {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .slider {
+                width: 50%;
+                margin: 10px auto;
+                display: block;
+            }
+
+            .mute-button {
+                background: #e43f5a;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            .mute-button:hover {
+                background: #c73148;
+            }
+
             #footer-thing {
                 margin-top: 40px;
                 padding: 10px;
@@ -56,19 +81,76 @@
         <div id="nav-thing"></div>
         <div class="container">
             <!-- SCX Icon -->
-            <img src="media/scxicon.png" alt="SCX Icon" class="icon" />
+            <img src="/media/scx-icon.png" alt="SCX Icon" class="icon" />
 
             <!-- Title -->
             <h1>Play Stroke Cube X</h1>
             <p>Enjoy the game directly on this page!</p>
 
             <!-- Embed the external HTML file -->
-            <iframe src="game.html" allowfullscreen></iframe>
+            <iframe id="gameFrame" src="game.html" allowfullscreen></iframe>
+
+            <!-- Volume Controls -->
+            <div class="controls">
+                <label for="volumeSlider">Volume:</label>
+                <input
+                    type="range"
+                    id="volumeSlider"
+                    class="slider"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value="1"
+                />
+                <br />
+                <button id="muteButton" class="mute-button">Mute</button>
+            </div>
         </div>
 
-        <div id="footer-thing">© 2025 Arcade Studios | All Rights Reserved
-            <br>
-            ©2025 Retro Software, Inc.
-        </div>
+        <div id="footer-thing">© 2025 Arcade Studios | All Rights Reserved</div>
+
+        <script>
+            // Get the iframe and control elements
+            const iframe = document.getElementById("gameFrame");
+            const volumeSlider = document.getElementById("volumeSlider");
+            const muteButton = document.getElementById("muteButton");
+
+            // Mute state
+            let isMuted = false;
+
+            // Adjust volume based on slider
+            volumeSlider.addEventListener("input", () => {
+                const volume = volumeSlider.value;
+
+                // Send the volume to the iframe if it supports postMessage
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({ type: "setVolume", volume }, "*");
+                }
+                isMuted = volume === "0";
+                muteButton.textContent = isMuted ? "Unmute" : "Mute";
+            });
+
+            // Mute/Unmute the iframe
+            muteButton.addEventListener("click", () => {
+                isMuted = !isMuted;
+                muteButton.textContent = isMuted ? "Unmute" : "Mute";
+
+                // Update slider and send mute command to the iframe
+                volumeSlider.value = isMuted ? "0" : "1";
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage(
+                        { type: "setVolume", volume: isMuted ? 0 : 1 },
+                        "*"
+                    );
+                }
+            });
+
+            // Ensure iframe supports the volume API
+            window.addEventListener("message", (event) => {
+                if (event.data.type === "volumeSupported") {
+                    console.log("Volume API supported by iframe.");
+                }
+            });
+        </script>
     </body>
 </html>
