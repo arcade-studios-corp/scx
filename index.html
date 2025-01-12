@@ -88,7 +88,7 @@
             <p>Enjoy the game directly on this page!</p>
 
             <!-- Embed the external HTML file -->
-            <iframe id="gameFrame" src="game.html" allowfullscreen></iframe>
+            <iframe frameborder="0" src="https://itch.io/embed-upload/12480377?color=494949" allowfullscreen="" width="640" height="380"><a href="https://turkfork.itch.io/scx">Play SCX on itch.io</a></iframe>
 
             <!-- Volume Controls -->
             <div class="controls">
@@ -108,49 +108,5 @@
         </div>
 
         <div id="footer-thing">© 2025 Arcade Studios | All Rights Reserved</div>
-
-        <script>
-            // Get the iframe and control elements
-            const iframe = document.getElementById("gameFrame");
-            const volumeSlider = document.getElementById("volumeSlider");
-            const muteButton = document.getElementById("muteButton");
-
-            // Mute state
-            let isMuted = false;
-
-            // Adjust volume based on slider
-            volumeSlider.addEventListener("input", () => {
-                const volume = volumeSlider.value;
-
-                // Send the volume to the iframe if it supports postMessage
-                if (iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({ type: "setVolume", volume }, "*");
-                }
-                isMuted = volume === "0";
-                muteButton.textContent = isMuted ? "Unmute" : "Mute";
-            });
-
-            // Mute/Unmute the iframe
-            muteButton.addEventListener("click", () => {
-                isMuted = !isMuted;
-                muteButton.textContent = isMuted ? "Unmute" : "Mute";
-
-                // Update slider and send mute command to the iframe
-                volumeSlider.value = isMuted ? "0" : "1";
-                if (iframe.contentWindow) {
-                    iframe.contentWindow.postMessage(
-                        { type: "setVolume", volume: isMuted ? 0 : 1 },
-                        "*"
-                    );
-                }
-            });
-
-            // Ensure iframe supports the volume API
-            window.addEventListener("message", (event) => {
-                if (event.data.type === "volumeSupported") {
-                    console.log("Volume API supported by iframe.");
-                }
-            });
-        </script>
     </body>
 </html>
